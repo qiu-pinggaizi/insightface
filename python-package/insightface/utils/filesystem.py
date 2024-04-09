@@ -2,7 +2,14 @@
 This code file mainly comes from https://github.com/dmlc/gluon-cv/blob/master/gluoncv/utils/filesystem.py
 """
 import os
+import os.path as osp
 import errno
+
+
+def get_model_dir(name, root='~/.insightface'):
+    root = os.path.expanduser(root)
+    model_dir = osp.join(root, 'models', name)
+    return model_dir
 
 def makedirs(path):
     """Create directory recursively if not exists.
@@ -18,6 +25,7 @@ def makedirs(path):
     except OSError as exc:
         if exc.errno != errno.EEXIST:
             raise
+
 
 def try_import(package, message=None):
     """Try import specified package, with custom message support.
@@ -42,6 +50,7 @@ def try_import(package, message=None):
             raise e
         raise ImportError(message)
 
+
 def try_import_cv2():
     """Try import cv2 at runtime.
 
@@ -52,7 +61,9 @@ def try_import_cv2():
     """
     msg = "cv2 is required, you can install by package manager, e.g. 'apt-get', \
         or `pip install opencv-python --user` (note that this is unofficial PYPI package)."
+
     return try_import('cv2', msg)
+
 
 def try_import_mmcv():
     """Try import mmcv at runtime.
@@ -64,7 +75,9 @@ def try_import_mmcv():
     """
     msg = "mmcv is required, you can install by first `pip install Cython --user` \
         and then `pip install mmcv --user` (note that this is unofficial PYPI package)."
+
     return try_import('mmcv', msg)
+
 
 def try_import_rarfile():
     """Try import rarfile at runtime.
@@ -76,7 +89,9 @@ def try_import_rarfile():
     """
     msg = "rarfile is required, you can install by first `sudo apt-get install unrar` \
         and then `pip install rarfile --user` (note that this is unofficial PYPI package)."
+
     return try_import('rarfile', msg)
+
 
 def import_try_install(package, extern_url=None):
     """Try import the specified package.
@@ -108,7 +123,8 @@ def import_try_install(package, extern_url=None):
 
         # trying to install package
         url = package if extern_url is None else extern_url
-        pipmain(['install', '--user', url])  # will raise SystemExit Error if fails
+        pipmain(['install', '--user',
+                 url])  # will raise SystemExit Error if fails
 
         # trying to load again
         try:
@@ -122,6 +138,7 @@ def import_try_install(package, extern_url=None):
             return __import__(package)
     return __import__(package)
 
+
 def try_import_dali():
     """Try import NVIDIA DALI at runtime.
     """
@@ -129,9 +146,12 @@ def try_import_dali():
         dali = __import__('nvidia.dali', fromlist=['pipeline', 'ops', 'types'])
         dali.Pipeline = dali.pipeline.Pipeline
     except ImportError:
+
         class dali:
             class Pipeline:
                 def __init__(self):
                     raise NotImplementedError(
-                        "DALI not found, please check if you installed it correctly.")
+                        "DALI not found, please check if you installed it correctly."
+                    )
+
     return dali
